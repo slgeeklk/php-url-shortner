@@ -63,6 +63,12 @@ if (!isset($_SESSION['userId'])) {
       <label for="password" class="form-label">Password (Optional)</label>
       <input type="text" class="form-control" id="password" name="password" placeholder="Leave blank for no password">
     </div>
+    <!-- Custom Short Code -->
+    <div class="mb-3">
+    <label for="customCode" class="form-label">Custom Short Code (Optional)</label>
+    <input type="text" class="form-control" id="customCode" name="customCode" placeholder="Enter your code or leave blank">
+    <div id="codeFeedback" class="form-text text-warning"></div>
+    </div>
 
     <button type="submit" class="btn btn-warning">Shorten</button>
     <div class="mt-3 text-center">
@@ -70,6 +76,39 @@ if (!isset($_SESSION['userId'])) {
     </div>
   </form>
 </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    let isCodeValid = true;
 
+    $('#customCode').on('input', function () {
+        const code = $(this).val().trim();
+
+        if (code.length > 0) {
+        $.post('./includes/check-code.ajax.php', { code }, function (data) {
+            if (data === 'taken') {
+            $('#codeFeedback').text('❌ This code is already taken.');
+            isCodeValid = false;
+            } else if (data === 'invalid') {
+            $('#codeFeedback').text('⚠️ Code should be 3–20 characters.');
+            isCodeValid = false;
+            } else {
+            $('#codeFeedback').text('✅ Code is available!');
+            isCodeValid = true;
+            }
+        });
+        } else {
+        $('#codeFeedback').text('');
+        isCodeValid = true;
+        }
+    });
+
+    // Prevent form submission if code is not available
+    $('form').on('submit', function (e) {
+        if (!isCodeValid) {
+        e.preventDefault();
+        alert("Please choose a valid and available short code.");
+        }
+    });
+    </script>
 </body>
 </html>
