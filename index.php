@@ -17,6 +17,7 @@ if (!empty($trimmed) && !preg_match("/\.php$/", $trimmed)) {
   <meta charset="UTF-8">
   <title>SL Geek Links - Shorten & Track</title>
   <link rel="icon" href="images/fav.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <style>
@@ -24,67 +25,79 @@ if (!empty($trimmed) && !preg_match("/\.php$/", $trimmed)) {
       font-family: "Segoe UI", sans-serif;
       background: linear-gradient(135deg, #1f1c2c, #928dab);
       color: #fff;
-      text-align: center;
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
+      min-height: 100vh;
+      text-align: center;
     }
 
     .logo img {
-      width: 140px;
+      width: 180px;
+      max-width: 80%;
     }
 
     .hero {
-      padding: 80px 20px 40px;
+      padding: 60px 20px 30px;
     }
 
     .hero h1 {
-      font-size: 3rem;
+      font-size: 2.5rem;
       font-weight: bold;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     .hero p {
-      font-size: 1.2rem;
-      margin-bottom: 30px;
+      font-size: 1.1rem;
+      margin-bottom: 25px;
     }
 
     .btn-custom {
-      padding: 10px 30px;
+      padding: 10px 25px;
       font-size: 1rem;
-      margin: 0 10px;
+      margin: 5px;
     }
 
     .shortener {
-      margin: 30px auto;
-      max-width: 600px;
+      margin: 20px auto 40px;
+      max-width: 650px;
+      width: 90%;
     }
 
     .features {
-      margin-top: 60px;
-    }
-
-    .features .col-md-3 {
-      margin-bottom: 30px;
+      margin-top: 40px;
     }
 
     .features i {
-      font-size: 2.5rem;
-      margin-bottom: 15px;
+      font-size: 2.2rem;
+      margin-bottom: 10px;
       display: block;
     }
 
     footer {
       margin-top: auto;
-      padding: 20px;
+      padding: 15px;
       background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    @media (max-width: 576px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+      .hero p {
+        font-size: 1rem;
+      }
+      .btn-custom {
+        display: block;
+        width: 80%;
+        margin: 10px auto;
+      }
     }
   </style>
 </head>
 <body>
 
   <div class="logo mt-4">
-    <img src="images/logo.png" alt="SL Geek Logo">
+    <img src="images/logo.png" alt="SL Geek Logo" class="img-fluid">
   </div>
 
   <div class="hero">
@@ -105,25 +118,25 @@ if (!empty($trimmed) && !preg_match("/\.php$/", $trimmed)) {
   <!-- Features -->
   <div class="container features">
     <div class="row text-center">
-      <div class="col-md-3">
+      <div class="col-6 col-md-3 mb-4">
         <i class="bi bi-link-45deg"></i>
-        <h5>Custom Short Links</h5>
-        <p>Create 8-character URLs in seconds.</p>
+        <h5>Short Links</h5>
+        <p>Generate short 8-character URLs easily.</p>
       </div>
-      <div class="col-md-3">
+      <div class="col-6 col-md-3 mb-4">
         <i class="bi bi-eye"></i>
         <h5>Click Tracking</h5>
-        <p>Know who clicks, from where, and how.</p>
+        <p>Know who clicks your links.</p>
       </div>
-      <div class="col-md-3">
+      <div class="col-6 col-md-3 mb-4">
         <i class="bi bi-shield-lock"></i>
-        <h5>Password Protection</h5>
-        <p>Restrict access to links securely.</p>
+        <h5>Password Lock</h5>
+        <p>Protect links with secure access.</p>
       </div>
-      <div class="col-md-3">
+      <div class="col-6 col-md-3 mb-4">
         <i class="bi bi-calendar-x"></i>
         <h5>Set Expiry</h5>
-        <p>Automatically disable links after a set time.</p>
+        <p>Auto-disable after a date.</p>
       </div>
     </div>
   </div>
