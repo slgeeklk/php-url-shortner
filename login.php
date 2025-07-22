@@ -5,6 +5,8 @@ if (isset($_SESSION['userId'])) {
     header("Location: dashboard/index.php");
     exit;
 }
+$error = $_SESSION['login_error'] ?? '';
+unset($_SESSION['login_error']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -29,6 +31,11 @@ if (isset($_SESSION['userId'])) {
 <body>
   <div class="container text-center">
     <img src="images/logo.png" alt="SL Geek Logo" class="mb-4" style="width: 150px">
+    <?php if (!empty($error)): ?>
+  <div class="alert alert-danger text-center">
+    <?= htmlspecialchars($error) ?>
+  </div>
+<?php endif; ?>
     <h2>Login to your Account</h2>
     <form action="includes/login.inc.php" method="post" class="mt-4">
       <div class="form-floating mb-3">
