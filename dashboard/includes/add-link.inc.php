@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['link_status'] = "Failed to create short link. Please try again.";
     }
 
-    header("Location: ../add-link.php");
+    header("Location: ../index.php");
     exit();
 }
 ?>

@@ -15,39 +15,53 @@ if (!isset($_SESSION['userId'])) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      font-family: "Segoe UI", sans-serif;
-      background: linear-gradient(135deg, #1f1c2c, #928dab);
-      color: #fff;
-      min-height: 100vh;
-    }
-    .container {
-      max-width: 600px;
-      margin-top: 80px;
-      background-color: rgba(255,255,255,0.05);
-      padding: 30px;
-      border-radius: 10px;
-    }
-    h2 {
-      margin-bottom: 20px;
-    }
-    .form-label {
-      font-weight: 500;
-    }
-    .btn {
-      width: 100%;
-    }
-    a {
-      color: #ffc107;
-    }
+        font-family: "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, #1f1c2c, #928dab);
+        color: #fff;
+        min-height: 100vh;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        }
+
+        .container {
+        width: 100%;
+        max-width: 600px;
+        background-color: rgba(255, 255, 255, 0.05);
+        padding: 30px;
+        border-radius: 10px;
+        box-sizing: border-box;
+        }
+
+        h2 {
+        margin-bottom: 20px;
+        }
+
+        .form-label {
+        font-weight: 500;
+        }
+
+        .btn {
+        width: 100%;
+        }
+
+        a {
+        color: #ffc107;
+        text-decoration: none;
+        }
+
+        a:hover {
+        text-decoration: underline;
+        }
   </style>
 </head>
 <body>
 
 <div class="container text-white">
   <h2 class="text-center">Create a New Short Link</h2>
-  <?php if (isset($_SESSION['link_status'])): ?>
-    <div class="alert alert-info"><?= $_SESSION['link_status']; unset($_SESSION['link_status']); ?></div>
-  <?php endif; ?>
+  
   <form action="./includes/add-link.inc.php" method="post">
     <div class="mb-3">
       <label for="destinationLink" class="form-label">Destination URL</label>
