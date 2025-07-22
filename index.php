@@ -1,13 +1,42 @@
 <?php
 session_start();
+require_once "includes/dbh.inc.php";
+date_default_timezone_set("Asia/Colombo");
 
-// Redirect if a short code is accessed
+// Check if it's a short code request
 $requestURI = $_SERVER['REQUEST_URI'];
 $trimmed = trim($requestURI, "/");
 
 if (!empty($trimmed) && !preg_match("/\.php$/", $trimmed)) {
-    header("Location: redirect.php?code=" . $trimmed);
-    exit;
+  $shortCode = $conn->real_escape_string($trimmed);
+  $stmt = $conn->prepare("SELECT destinationLink, linkExpiry, linkPassword FROM linkuserlinks WHERE shortCode = ? LIMIT 1");
+  $stmt->bind_param("s", $shortCode);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  if ($row = $result->fetch_assoc()) {
+    $now = date("Y-m-d H:i:s");
+    if ($row['linkExpiry'] !== "0" && $row['linkExpiry'] < $now) {
+      $error = "This link has expired.";
+    } elseif ($row['linkPassword'] !== "0") {
+      if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['linkPassword'])) {
+        if (password_verify($_POST['linkPassword'], $row['linkPassword'])) {
+          header("Location: " . $row['destinationLink']);
+          exit;
+        } else {
+          $error = "Incorrect password.";
+        }
+      } else {
+        $askPassword = true;
+      }
+    } else {
+      header("Location: " . $row['destinationLink']);
+      exit;
+    }
+  } else {
+    $error = "Invalid or broken short link.";
+  }
+  $stmt->close();
 }
 ?>
 
@@ -107,7 +136,15 @@ if (!empty($trimmed) && !preg_match("/\.php$/", $trimmed)) {
     <a href="register.php" class="btn btn-outline-light btn-custom">Register</a>
   </div>
 
-  <!-- Link Shortener Input -->
+  <?php if (!empty($error)): ?>
+    <div class="alert alert-danger w-75 mx-auto"> <?= htmlspecialchars($error) ?> </div>
+  <?php elseif (!empty($askPassword)): ?>
+    <form method="POST" class="w-75 mx-auto mb-4">
+      <input type="password" name="linkPassword" class="form-control mb-3" placeholder="Enter password to continue" required>
+      <button type="submit" class="btn btn-warning">Access Link</button>
+    </form>
+  <?php endif; ?>
+
   <div class="shortener px-3">
     <form id="shortForm" class="input-group">
       <input type="url" class="form-control" placeholder="Paste your long URL here..." name="destinationLink" required>
@@ -115,7 +152,6 @@ if (!empty($trimmed) && !preg_match("/\.php$/", $trimmed)) {
     </form>
   </div>
 
-  <!-- Features -->
   <div class="container features">
     <div class="row text-center">
       <div class="col-6 col-md-3 mb-4">
@@ -141,7 +177,6 @@ if (!empty($trimmed) && !preg_match("/\.php$/", $trimmed)) {
     </div>
   </div>
 
-  <!-- Modal -->
   <div class="modal fade" id="copiedModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content bg-dark text-white">
