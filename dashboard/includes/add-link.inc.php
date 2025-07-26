@@ -15,7 +15,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $destinationLink = trim($_POST['destinationLink']);
     $customCode     = trim($_POST['customCode']);
     $expiryInput    = trim($_POST['expiry'] ?? '');
-    $passwordInput  = trim($_POST['password'] ?? '');
+    // grab raw input
+    $passwordRaw = trim($_POST['password'] ?? '');
+    // if empty, use '0', otherwise store hashed
+    $passwordInput = $passwordRaw === ''
+        ? '0'
+        : password_hash($passwordRaw, PASSWORD_DEFAULT);
     $userId         = $_SESSION['userId'];
 
     // Validate URL
@@ -115,10 +120,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text)
       .catch(() => fallbackCopy(text))
-      .finally(() => window.location.href = "../index.php");
+      https://link.slgeek.lk/I1MtKrNp
+      //.finally(() => window.location.href = "../index.php");
   } else {
     fallbackCopy(text);
-    window.location.href = "../index.php";
+    echo $passwordRaw;
+    //window.location.href = "../index.php";
   }
 })();
 </script>
@@ -128,7 +135,8 @@ HTML;
     exit();
 } else {
         $_SESSION['link_status'] = "Failed to create short link. Please try again.";
-        header("Location: ../add-link.php");
+        echo $passwordRaw;
+        //header("Location: ../add-link.php");
         exit();
     }
 }

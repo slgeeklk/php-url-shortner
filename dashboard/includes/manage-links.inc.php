@@ -38,10 +38,12 @@ if ($action === 'update' && isset($_POST['linkId'])) {
     }
 
     // Normalize password
-    $password = trim($_POST['password'] ?? '');
-    if ($password === '') {
-        $password = '0';
-    }
+    // grab raw input
+    $passwordRaw = trim($_POST['password'] ?? '');
+    // if empty, use '0', otherwise hash it
+    $password = $passwordRaw === ''
+        ? '0'
+        : password_hash($passwordRaw, PASSWORD_DEFAULT);
 
     $stmt = $conn->prepare("
       UPDATE linkuserlinks

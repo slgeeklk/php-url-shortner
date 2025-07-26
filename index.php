@@ -6,43 +6,60 @@ session_start();
 require_once "includes/dbh.inc.php";
 date_default_timezone_set("Asia/Colombo");
 
+$error       = '';
+$askPassword = false;
+
 // Check if it's a short code request
 $requestURI = $_SERVER['REQUEST_URI'];
-$trimmed = trim($requestURI, "/");
+$trimmed    = trim($requestURI, "/");
 
 if (!empty($trimmed) && !preg_match("/\.php$/", $trimmed)) {
   $shortCode = $conn->real_escape_string($trimmed);
-  $stmt = $conn->prepare("SELECT destinationLink, linkExpiry, linkPassword FROM linkuserlinks WHERE shortCode = ? LIMIT 1");
+  $stmt      = $conn->prepare("
+    SELECT destinationLink, linkExpiry, linkPassword
+    FROM linkuserlinks
+    WHERE shortCode = ?
+    LIMIT 1
+  ");
   $stmt->bind_param("s", $shortCode);
   $stmt->execute();
   $result = $stmt->get_result();
 
   if ($row = $result->fetch_assoc()) {
     $now = date("Y-m-d H:i:s");
+
+    // expired?
     if ($row['linkExpiry'] !== "0" && $row['linkExpiry'] < $now) {
       $error = "This link has expired.";
+
+    // password protected?
     } elseif ($row['linkPassword'] !== "0") {
+      $askPassword = true;
+
       if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['linkPassword'])) {
-        if (password_verify($_POST['linkPassword'], $row['linkPassword'])) {
+        $input = trim($_POST['linkPassword']);
+        if (password_verify($input, $row['linkPassword'])) {
           header("Location: " . $row['destinationLink']);
           exit;
         } else {
-          $error = "Incorrect password.";
+          $error       = "Incorrect password.";
+          $askPassword = true;  // ensure form stays visible
         }
-      } else {
-        $askPassword = true;
       }
+
+    // open redirect
     } else {
       header("Location: " . $row['destinationLink']);
       exit;
     }
+
   } else {
     $error = "Invalid or broken short link.";
   }
+
   $stmt->close();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -62,67 +79,54 @@ if (!empty($trimmed) && !preg_match("/\.php$/", $trimmed)) {
       min-height: 100vh;
       text-align: center;
     }
-
     .logo img {
       width: 180px;
       max-width: 80%;
     }
-
     .hero {
       padding: 60px 20px 30px;
     }
-
     .hero h1 {
       font-size: 2.5rem;
       font-weight: bold;
       margin-bottom: 15px;
     }
-
     .hero p {
       font-size: 1.1rem;
       margin-bottom: 25px;
     }
-
     .btn-custom {
       padding: 10px 25px;
       font-size: 1rem;
       margin: 5px;
     }
-
     .shortener {
       margin: 20px auto 40px;
       max-width: 650px;
       width: 90%;
     }
-
     .features {
       margin-top: 40px;
     }
-
     .features i {
       font-size: 2.2rem;
       margin-bottom: 10px;
       display: block;
     }
-
+    /* new: limit password‐form width */
+    .password-form {
+      max-width: 360px;
+      margin: 1.5rem auto;
+    }
     footer {
       margin-top: auto;
       padding: 15px;
       background-color: rgba(255, 255, 255, 0.1);
     }
-
     @media (max-width: 576px) {
-      .hero h1 {
-        font-size: 2rem;
-      }
-      .hero p {
-        font-size: 1rem;
-      }
-      .btn-custom {
-        display: block;
-        width: 80%;
-        margin: 10px auto;
-      }
+      .hero h1 { font-size: 2rem; }
+      .hero p  { font-size: 1rem; }
+      .btn-custom { display: block; width: 80%; margin: 10px auto; }
     }
   </style>
 </head>
@@ -140,17 +144,31 @@ if (!empty($trimmed) && !preg_match("/\.php$/", $trimmed)) {
   </div>
 
   <?php if (!empty($error)): ?>
-    <div class="alert alert-danger w-75 mx-auto"> <?= htmlspecialchars($error) ?> </div>
-  <?php elseif (!empty($askPassword)): ?>
-    <form method="POST" class="w-75 mx-auto mb-4">
-      <input type="password" name="linkPassword" class="form-control mb-3" placeholder="Enter password to continue" required>
-      <button type="submit" class="btn btn-warning">Access Link</button>
+    <div class="alert alert-danger w-75 mx-auto">
+      <?= htmlspecialchars($error) ?>
+    </div>
+  <?php endif; ?>
+
+  <?php if ($askPassword): ?>
+    <form method="POST" class="password-form mb-4">
+      <input 
+        type="password" 
+        name="linkPassword" 
+        class="form-control mb-3" 
+        placeholder="Enter password to continue" 
+        required>
+      <button type="submit" class="btn btn-warning w-100">Access Link</button>
     </form>
   <?php endif; ?>
 
   <div class="shortener px-3">
     <form id="shortForm" class="input-group">
-      <input type="url" class="form-control" placeholder="Paste your long URL here..." name="destinationLink" required>
+      <input 
+        type="url" 
+        class="form-control" 
+        placeholder="Paste your long URL here..." 
+        name="destinationLink" 
+        required>
       <button type="submit" class="btn btn-warning">Shorten</button>
     </form>
   </div>
